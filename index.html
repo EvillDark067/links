@@ -140,6 +140,9 @@
             <button id="itinerantPanelBtn" onclick="showPanel('itinerant')" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition mr-4">
                 📡 Links Itinerantes
             </button>
+            <button id="hotspotPanelBtn" onclick="showPanel('hotspot')" class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition mr-4">
+                📶 Links de Hotspot
+            </button>
         </div>
 
         <!-- Botões de Exportação -->
@@ -300,10 +303,113 @@
         </div>
     </div>
 
+    <!-- Painel de Links de Hotspot -->
+    <div id="hotspotPanel" class="container mx-auto px-4 py-8 hidden">
+        <!-- Header do Painel Hotspot -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">📶 Gerenciamento de Links de Hotspot</h2>
+            <p class="text-gray-600">Gerencie pontos de acesso Wi-Fi para disponibilizar internet em locais públicos</p>
+            
+            <!-- Resumo dos Links de Hotspot -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+                <div class="bg-orange-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-orange-600" id="totalHotspotLinks">0</div>
+                    <div class="text-sm text-gray-600">Links de Hotspot</div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-blue-600" id="activeHotspotLinks">0</div>
+                    <div class="text-sm text-gray-600">Links Ativos</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-green-600" id="totalHotspotLocations">0</div>
+                    <div class="text-sm text-gray-600">Localizações</div>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-purple-600" id="hotspotCoverage">0</div>
+                    <div class="text-sm text-gray-600">Cobertura (%)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Adicionar Link de Hotspot -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-xl card-shadow p-6">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">➕ Adicionar Link de Hotspot</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Nome do Hotspot</label>
+                        <input type="text" id="hotspotLinkName" placeholder="Ex: Hotspot Praça Central" 
+                               class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Endereço do Local</label>
+                        <input type="text" id="hotspotAddress" placeholder="Ex: Praça da Matriz, s/n - Centro" 
+                               class="w-full border rounded px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Coordenadas GPS</label>
+                        <input type="text" id="hotspotCoordinates" placeholder="Ex: -30.1234, -51.5678" 
+                               class="w-full border rounded px-3 py-2">
+                    </div>
+
+                    <button onclick="addHotspotLink()" class="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-700 transition">
+                        Adicionar Hotspot
+                    </button>
+                </div>
+            </div>
+
+            <!-- Informações sobre Hotspots -->
+            <div class="bg-white rounded-xl card-shadow p-6">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">ℹ️ Informações sobre Hotspots</h3>
+                
+                <div class="space-y-4 text-sm text-gray-600">
+                    <div class="bg-orange-50 p-3 rounded">
+                        <strong>Finalidade:</strong> Fornecer acesso Wi-Fi gratuito em locais públicos
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded">
+                        <strong>Cobertura:</strong> 360 graus com alcance mínimo de 180 metros de raio
+                    </div>
+                    <div class="bg-green-50 p-3 rounded">
+                        <strong>Capacidade:</strong> 125 usuários (Tipo I) ou 250 usuários (Tipo II)
+                    </div>
+                    <div class="bg-yellow-50 p-3 rounded">
+                        <strong>Velocidade:</strong> 40 Mbps por hotspot (soma no concentrador)
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded">
+                        <strong>Configuração:</strong> Rede aberta com portal de autenticação
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Links de Hotspot -->
+        <div class="bg-white rounded-xl card-shadow p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">📶 Hotspots Cadastrados</h3>
+                <div class="space-x-2">
+                    <button onclick="exportHotspotToPDF()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition text-sm">
+                        📄 PDF
+                    </button>
+                    <button onclick="exportHotspotToCSV()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-sm">
+                        📊 CSV
+                    </button>
+                </div>
+            </div>
+            
+            <div id="hotspotLinksList" class="space-y-4">
+                <div class="text-gray-500 text-center py-8">
+                    Nenhum hotspot cadastrado ainda
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let links = [];
         let concentratorCapacity = 100;
         let itinerantLinks = [];
+        let hotspotLinks = [];
         let currentPanel = 'main';
         let config = {
             sla: 98.5,
@@ -359,7 +465,9 @@
 
         function updateDisplay() {
             const totalLinks = links.length;
-            const totalBandwidth = links.reduce((sum, link) => sum + link.speed, 0);
+            const externalBandwidth = links.reduce((sum, link) => sum + link.speed, 0);
+            const hotspotBandwidth = hotspotLinks.filter(link => link.isActive).reduce((sum, link) => sum + link.speed, 0);
+            const totalBandwidth = externalBandwidth + hotspotBandwidth;
             
             // Ajustar automaticamente o concentrador para a próxima capacidade disponível
             if (totalBandwidth > 0) {
@@ -554,26 +662,41 @@
         function showPanel(panel) {
             const mainPanel = document.querySelector('.container');
             const itinerantPanel = document.getElementById('itinerantPanel');
+            const hotspotPanel = document.getElementById('hotspotPanel');
             const mainBtn = document.getElementById('mainPanelBtn');
             const itinerantBtn = document.getElementById('itinerantPanelBtn');
+            const hotspotBtn = document.getElementById('hotspotPanelBtn');
+
+            // Esconder todos os painéis
+            mainPanel.classList.add('hidden');
+            itinerantPanel.classList.add('hidden');
+            hotspotPanel.classList.add('hidden');
+
+            // Resetar cores dos botões
+            mainBtn.classList.remove('bg-blue-600');
+            mainBtn.classList.add('bg-gray-400');
+            itinerantBtn.classList.remove('bg-purple-600');
+            itinerantBtn.classList.add('bg-gray-400');
+            hotspotBtn.classList.remove('bg-orange-600');
+            hotspotBtn.classList.add('bg-gray-400');
 
             if (panel === 'main') {
                 mainPanel.classList.remove('hidden');
-                itinerantPanel.classList.add('hidden');
                 mainBtn.classList.add('bg-blue-600');
                 mainBtn.classList.remove('bg-gray-400');
-                itinerantBtn.classList.add('bg-gray-400');
-                itinerantBtn.classList.remove('bg-purple-600');
                 currentPanel = 'main';
             } else if (panel === 'itinerant') {
-                mainPanel.classList.add('hidden');
                 itinerantPanel.classList.remove('hidden');
                 itinerantBtn.classList.add('bg-purple-600');
                 itinerantBtn.classList.remove('bg-gray-400');
-                mainBtn.classList.add('bg-gray-400');
-                mainBtn.classList.remove('bg-blue-600');
                 currentPanel = 'itinerant';
                 updateItinerantDisplay();
+            } else if (panel === 'hotspot') {
+                hotspotPanel.classList.remove('hidden');
+                hotspotBtn.classList.add('bg-orange-600');
+                hotspotBtn.classList.remove('bg-gray-400');
+                currentPanel = 'hotspot';
+                updateHotspotDisplay();
             }
         }
 
@@ -1039,9 +1162,269 @@
             doc.save(`link-itinerante-${link.name.replace(/\s+/g, '-').toLowerCase()}.pdf`);
         }
 
+        // Funções para Links de Hotspot
+        function addHotspotLink() {
+            const name = document.getElementById('hotspotLinkName').value.trim();
+            const address = document.getElementById('hotspotAddress').value.trim();
+            const coordinates = document.getElementById('hotspotCoordinates').value.trim();
+
+            if (!name || !address || !coordinates) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            const currentDate = new Date().toLocaleDateString('pt-BR');
+
+            const hotspotLink = {
+                id: Date.now(),
+                name: name,
+                address: address,
+                coordinates: coordinates,
+                dateCreated: currentDate,
+                isActive: true,
+                speed: 40 // Cada hotspot tem 40 Mbps
+            };
+
+            hotspotLinks.push(hotspotLink);
+            updateHotspotDisplay();
+            updateDisplay(); // Atualizar o concentrador principal também
+            clearHotspotForm();
+        }
+
+        function removeHotspotLink(id) {
+            hotspotLinks = hotspotLinks.filter(link => link.id !== id);
+            updateHotspotDisplay();
+            updateDisplay(); // Atualizar o concentrador principal também
+        }
+
+        function toggleHotspotLink(id) {
+            const link = hotspotLinks.find(l => l.id === id);
+            if (link) {
+                link.isActive = !link.isActive;
+                updateHotspotDisplay();
+                updateDisplay(); // Atualizar o concentrador principal também
+            }
+        }
+
+        function updateHotspotDisplay() {
+            const totalHotspotLinks = hotspotLinks.length;
+            const activeHotspotLinks = hotspotLinks.filter(link => link.isActive).length;
+            const totalHotspotLocations = hotspotLinks.length; // Cada hotspot é uma localização
+            const hotspotCoverage = totalHotspotLinks > 0 ? Math.round((activeHotspotLinks / totalHotspotLinks) * 100) : 0;
+
+            document.getElementById('totalHotspotLinks').textContent = totalHotspotLinks;
+            document.getElementById('activeHotspotLinks').textContent = activeHotspotLinks;
+            document.getElementById('totalHotspotLocations').textContent = totalHotspotLocations;
+            document.getElementById('hotspotCoverage').textContent = hotspotCoverage;
+
+            updateHotspotLinksList();
+        }
+
+        function updateHotspotLinksList() {
+            const hotspotLinksList = document.getElementById('hotspotLinksList');
+            
+            if (hotspotLinks.length === 0) {
+                hotspotLinksList.innerHTML = '<div class="text-gray-500 text-center py-8">Nenhum hotspot cadastrado ainda</div>';
+                return;
+            }
+
+            hotspotLinksList.innerHTML = hotspotLinks.map(link => `
+                <div class="border rounded-lg p-6 ${link.isActive ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-grow">
+                            <h4 class="text-lg font-semibold">${link.name}</h4>
+                            <p class="text-sm text-gray-600 mt-1">📍 ${link.address}</p>
+                            <p class="text-sm text-gray-600">🌐 ${link.coordinates}</p>
+                            <p class="text-sm text-gray-600">📅 Cadastrado em: ${link.dateCreated}</p>
+                            
+                            <div class="mt-2">
+                                <span class="inline-block px-2 py-1 text-xs rounded ${link.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                    ${link.isActive ? '✅ Ativo' : '⏸️ Inativo'}
+                                </span>
+                                <span class="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800 ml-2">
+                                    📶 Wi-Fi Público
+                                </span>
+                                <span class="inline-block px-2 py-1 text-xs rounded bg-blue-100 text-blue-800 ml-2">
+                                    👥 125-250 usuários
+                                </span>
+                                <span class="inline-block px-2 py-1 text-xs rounded bg-purple-100 text-purple-800 ml-2">
+                                    ⚡ 40 Mbps
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 ml-4">
+                            <button onclick="exportHotspotLinkToPDF(${link.id})" 
+                                    class="px-3 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600 transition">
+                                📄 PDF
+                            </button>
+                            <button onclick="toggleHotspotLink(${link.id})" 
+                                    class="px-3 py-1 text-xs rounded transition ${link.isActive ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-green-500 text-white hover:bg-green-600'}">
+                                ${link.isActive ? '⏸️ Desativar' : '▶️ Ativar'}
+                            </button>
+                            <button onclick="removeHotspotLink(${link.id})" 
+                                    class="px-3 py-1 text-xs rounded bg-red-500 text-white hover:bg-red-600 transition">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function clearHotspotForm() {
+            document.getElementById('hotspotLinkName').value = '';
+            document.getElementById('hotspotAddress').value = '';
+            document.getElementById('hotspotCoordinates').value = '';
+        }
+
+        function exportHotspotToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(16);
+            doc.text('Relatório de Links de Hotspot - Prefeitura de Guaíba', 20, 20);
+            doc.setFontSize(12);
+            doc.text('Pregão Eletrônico 71/2022', 20, 30);
+            
+            let y = 50;
+            
+            // Resumo
+            const totalHotspotLinks = hotspotLinks.length;
+            const activeHotspotLinks = hotspotLinks.filter(link => link.isActive).length;
+            const hotspotCoverage = totalHotspotLinks > 0 ? Math.round((activeHotspotLinks / totalHotspotLinks) * 100) : 0;
+            
+            doc.text(`Total de Hotspots: ${totalHotspotLinks}`, 20, y);
+            y += 10;
+            doc.text(`Hotspots Ativos: ${activeHotspotLinks}`, 20, y);
+            y += 10;
+            doc.text(`Cobertura: ${hotspotCoverage}%`, 20, y);
+            y += 20;
+            
+            // Hotspots
+            doc.text('Hotspots Cadastrados:', 20, y);
+            y += 10;
+            
+            hotspotLinks.forEach(link => {
+                doc.text(`• ${link.name}`, 25, y);
+                y += 8;
+                doc.text(`  Endereço: ${link.address}`, 30, y);
+                y += 6;
+                doc.text(`  Coordenadas: ${link.coordinates}`, 30, y);
+                y += 6;
+                doc.text(`  Status: ${link.isActive ? 'Ativo' : 'Inativo'}`, 30, y);
+                y += 6;
+                doc.text(`  Data: ${link.dateCreated}`, 30, y);
+                y += 10;
+                
+                if (y > 250) {
+                    doc.addPage();
+                    y = 20;
+                }
+            });
+            
+            doc.save('relatorio-hotspots-guaiba.pdf');
+        }
+
+        function exportHotspotToCSV() {
+            let csv = 'Nome,Endereço,Coordenadas,Status,Data de Cadastro\n';
+            
+            hotspotLinks.forEach(link => {
+                csv += `"${link.name}","${link.address}","${link.coordinates}","${link.isActive ? 'Ativo' : 'Inativo'}","${link.dateCreated}"\n`;
+            });
+            
+            csv += '\nResumo:\n';
+            csv += `Total de Hotspots,${hotspotLinks.length}\n`;
+            csv += `Hotspots Ativos,${hotspotLinks.filter(link => link.isActive).length}\n`;
+            csv += `Cobertura,${hotspotLinks.length > 0 ? Math.round((hotspotLinks.filter(link => link.isActive).length / hotspotLinks.length) * 100) : 0}%\n`;
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hotspots-guaiba.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function exportHotspotLinkToPDF(linkId) {
+            const link = hotspotLinks.find(l => l.id === linkId);
+            if (!link) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(16);
+            doc.text('Relatório de Hotspot - Prefeitura de Guaíba', 20, 20);
+            doc.setFontSize(12);
+            doc.text('Pregão Eletrônico 71/2022', 20, 30);
+            
+            let y = 50;
+            
+            // Informações do Hotspot
+            doc.setFontSize(14);
+            doc.text('Informações do Hotspot:', 20, y);
+            y += 15;
+            
+            doc.setFontSize(12);
+            doc.text(`Nome: ${link.name}`, 25, y);
+            y += 10;
+            doc.text(`Endereço: ${link.address}`, 25, y);
+            y += 10;
+            doc.text(`Coordenadas: ${link.coordinates}`, 25, y);
+            y += 10;
+            doc.text(`Data de Cadastro: ${link.dateCreated}`, 25, y);
+            y += 10;
+            doc.text(`Velocidade: 40 Mbps`, 25, y);
+            y += 20;
+            
+            doc.text('Área de cobertura 360 graus, com alcance mínimo de', 25, y);
+            y += 8;
+            doc.text('180 metros de raio.', 25, y);
+            y += 15;
+            
+            doc.text('Suporte para no mínimo 125 acessos simultâneos', 25, y);
+            y += 8;
+            doc.text('(Hotspot Tipo I) e 250 acessos simultâneos', 25, y);
+            y += 8;
+            doc.text('(Hotspot Tipo II).', 25, y);
+            y += 20;
+            
+            // Equipamentos
+            doc.setFontSize(14);
+            doc.text('Equipamentos Necessários:', 20, y);
+            y += 15;
+            
+            doc.setFontSize(12);
+            doc.text('• Access Point Wi-Fi', 25, y);
+            y += 10;
+            doc.text('• Controlador de Rede', 25, y);
+            y += 10;
+            doc.text('• Switch PoE', 25, y);
+            y += 10;
+            doc.text('• Cabeamento de Rede', 25, y);
+            y += 20;
+            
+            // Observações
+            doc.setFontSize(14);
+            doc.text('Observações:', 20, y);
+            y += 15;
+            
+            doc.setFontSize(12);
+            doc.text('Este hotspot foi configurado para fornecer acesso Wi-Fi', 25, y);
+            y += 8;
+            doc.text('gratuito à população, conforme especificações do', 25, y);
+            y += 8;
+            doc.text('Pregão Eletrônico 71/2022 da Prefeitura de Guaíba.', 25, y);
+            
+            doc.save(`hotspot-${link.name.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+        }
+
         // Inicializar
         updateDisplay();
         updateItinerantDisplay();
+        updateHotspotDisplay();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97fa679557aba623',t:'MTc1Nzk2MzIyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97fa7d520198c134',t:'MTc1Nzk2NDExMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
